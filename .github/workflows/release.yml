@@ -2,8 +2,8 @@ name: Package and release addon
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -16,21 +16,73 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read release version from commit message
+        id: version
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          subject="${COMMIT_MESSAGE%%$'\n'*}"
+
+          if [[ "$subject" =~ ^(v[0-9]+\.[0-9]+\.[0-9]+):[[:space:]]*(.*)$ ]]; then
+            echo "tag=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "version=${BASH_REMATCH[1]#v}" >> "$GITHUB_OUTPUT"
+            echo "message=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "No versioned commit message found; skipping release."
+          fi
+
+      - name: Update TOC versions
+        if: steps.version.outputs.version != ''
+        env:
+          ADDON_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for toc in JumpMaster9000/*.toc; do
+            sed -i -E "s/^## Version: .*/## Version: ${ADDON_VERSION}/" "$toc"
+          done
+
+          git diff -- JumpMaster9000/*.toc
+
+      - name: Commit TOC version updates
+        if: steps.version.outputs.version != ''
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if ! git diff --quiet -- JumpMaster9000/*.toc; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add JumpMaster9000/*.toc
+            git diff --cached --quiet && exit 0
+            git commit -m "${RELEASE_TAG}: update addon version [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
       - name: Create addon ZIP
+        if: steps.version.outputs.version != ''
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
         run: |
           mkdir -p dist
-          zip -r dist/JumpMaster9000.zip JumpMaster9000
-          unzip -l dist/JumpMaster9000.zip
+          zip -r "dist/JumpMaster9000-${RELEASE_TAG}.zip" JumpMaster9000
+          unzip -l "dist/JumpMaster9000-${RELEASE_TAG}.zip"
 
       - name: Upload ZIP to GitHub Release
+        if: steps.version.outputs.version != ''
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          RELEASE_MESSAGE: ${{ steps.version.outputs.message }}
         run: |
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" dist/JumpMaster9000.zip --clobber
+          release_sha="$(git rev-parse HEAD)"
+          zip_name="JumpMaster9000-${RELEASE_TAG}.zip"
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "dist/${zip_name}" --clobber
           else
-            gh release create "$GITHUB_REF_NAME" dist/JumpMaster9000.zip \
-              --title "JumpMaster9000 $GITHUB_REF_NAME" \
-              --generate-notes
+            gh release create "$RELEASE_TAG" "dist/${zip_name}" \
+              --target "$release_sha" \
+              --title "JumpMaster9000 ${RELEASE_TAG}" \
+              --notes "${RELEASE_MESSAGE:-Release ${RELEASE_TAG}}"
           fi
