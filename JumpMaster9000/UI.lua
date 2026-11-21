@@ -2,7 +2,7 @@ local addonName, addon = ...
 addon = JumpMaster9000
 
 local ui = CreateFrame("Frame", addonName .. "UI", UIParent)
-ui:SetSize(220, 70)
+ui:SetSize(220, 50)
 ui:SetPoint("CENTER")
 ui:SetMovable(true)
 ui:EnableMouse(true)
@@ -12,7 +12,7 @@ ui:SetScript("OnDragStop", ui.StopMovingOrSizing)
 ui:Hide()
 
 local function createStatRow(parent, row, labelText, valueText)
-    local yOffset = -(row - 1) * 18
+    local yOffset = -(row - 1) * 12
 
     local label = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     label:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, yOffset)
