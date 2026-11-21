@@ -25,7 +25,7 @@ addon.eventFrame:SetScript("OnEvent", function(self, event, loadedAddonName)
 end)
 
 SLASH_JUMPMASTER90001 = "/jumpmaster"
-SLASH_JUMPMASTER90002 = "/jm9000"
+SLASH_JUMPMASTER90002 = "/jm9k"
 
 SlashCmdList.JUMPMASTER9000 = function()
     if addon.UI and addon.UI.Toggle then
