@@ -11,25 +11,25 @@ ui:SetScript("OnDragStart", ui.StartMoving)
 ui:SetScript("OnDragStop", ui.StopMovingOrSizing)
 ui:Hide()
 
-local function createStatRow(parent, relativeTo, labelText, valueText)
+local function createStatRow(parent, row, labelText, valueText)
+    local yOffset = -(row - 1) * 18
+
     local label = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    label:SetPoint("TOPLEFT", relativeTo or parent, relativeTo and "BOTTOMLEFT" or "TOPLEFT", 0, relativeTo and -4 or 0)
+    label:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, yOffset)
     label:SetJustifyH("LEFT")
     label:SetText(labelText)
 
     local value = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    value:SetPoint("TOPRIGHT", relativeTo or parent, relativeTo and "BOTTOMRIGHT" or "TOPRIGHT", 0, relativeTo and -4 or 0)
+    value:SetPoint("TOPRIGHT", parent, "TOPRIGHT", 0, yOffset)
     value:SetJustifyH("RIGHT")
     value:SetText(valueText)
-
-    return label
 end
 
-local accountJumps = createStatRow(ui, nil, "Account Jumps", "0")
-local characterJumps = createStatRow(ui, accountJumps, "Character Jumps", "0")
-local sessionJumps = createStatRow(ui, characterJumps, "Session Jumps", "0")
-local jumpsPerHour = createStatRow(ui, sessionJumps, "Jumps Per Hour", "0")
-local sinceLastJump = createStatRow(ui, jumpsPerHour, "Since Last Jump", "00:00")
+createStatRow(ui, 1, "Account Jumps", "0")
+createStatRow(ui, 2, "Character Jumps", "0")
+createStatRow(ui, 3, "Session Jumps", "0")
+createStatRow(ui, 4, "Jumps Per Hour", "0")
+createStatRow(ui, 5, "Since Last Jump", "00:00")
 
 function ui:Toggle()
     if self:IsShown() then
