@@ -2,7 +2,7 @@
 ## Title: JumpMaster9000
 ## Notes: A fun addon for tracking jumps.
 ## Author:
-## Version: 0.1.6
+## Version: 0.1.7
 ## IconTexture: Interface\Icons\INV_Misc_Foot_Centaur
 ## SavedVariables: JumpMaster9000DB
 
