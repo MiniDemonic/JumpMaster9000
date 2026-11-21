@@ -1,0 +1,36 @@
+name: Package and release addon
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create addon release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create addon ZIP
+        run: |
+          mkdir -p dist
+          zip -r dist/JumpMaster9000.zip JumpMaster9000
+          unzip -l dist/JumpMaster9000.zip
+
+      - name: Upload ZIP to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/JumpMaster9000.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/JumpMaster9000.zip \
+              --title "JumpMaster9000 $GITHUB_REF_NAME" \
+              --generate-notes
+          fi
