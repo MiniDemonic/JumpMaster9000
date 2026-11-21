@@ -2,7 +2,7 @@ local addonName, addon = ...
 addon = JumpMaster9000
 
 local ui = CreateFrame("Frame", addonName .. "UI", UIParent)
-ui:SetSize(220, 100)
+ui:SetSize(220, 70)
 ui:SetPoint("CENTER")
 ui:SetMovable(true)
 ui:EnableMouse(true)
