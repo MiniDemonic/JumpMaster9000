@@ -1,0 +1,10 @@
+## Interface: 120105
+## Title: JumpMaster9000
+## Notes: A fun addon for tracking jumps.
+## Author:
+## Version: 0.1.0
+## IconTexture: Interface\Icons\INV_Misc_Foot_Centaur
+## SavedVariables: JumpMaster9000DB
+
+Core.lua
+UI.lua
