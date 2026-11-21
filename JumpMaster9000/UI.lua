@@ -25,7 +25,7 @@ local function createStatRow(parent, row, labelText, valueText)
     value:SetText(valueText)
 end
 
-createStatRow(ui, 1, "Account Jumps", "0")
+createStatRow(ui, 1, "Account Jumps", "1")
 createStatRow(ui, 2, "Character Jumps", "0")
 createStatRow(ui, 3, "Session Jumps", "0")
 createStatRow(ui, 4, "Jumps Per Hour", "0")
